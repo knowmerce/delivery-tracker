@@ -44,7 +44,7 @@ class UPSTrackScraper {
       )}&loc=en_US`
     );
 
-    const cookies = [];
+    const cookies: Cookie[] = [];
     for (const [name, value] of trackPageResponse.headers.entries()) {
       if (name !== "set-cookie") continue;
       const cookie = Cookie.parse(value);

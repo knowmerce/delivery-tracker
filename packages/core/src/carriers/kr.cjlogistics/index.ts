@@ -1,7 +1,7 @@
 import { Cookie } from "tough-cookie";
 import * as cheerio from "cheerio";
 import { DateTime } from "luxon";
-import { parsePhoneNumber } from "libphonenumber-js";
+import { PhoneNumber, parsePhoneNumber } from "libphonenumber-js";
 import {
   Carrier,
   type ContactInfo,
@@ -208,7 +208,7 @@ class CJLogisticsTrackScraper {
       return null;
     }
 
-    let phoneNumber = null;
+    let phoneNumber: PhoneNumber | null = null;
     try {
       phoneNumber = parsePhoneNumber(match[2], "KR");
     } catch (e) {

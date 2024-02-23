@@ -1,11 +1,19 @@
 {
-  "name": "@delivery-tracker/core",
-  "private": true,
+  "name": "@knowmerce/delivery-tracker-core",
+  "version": "0.3.0",
   "type": "commonjs",
   "exports": {
     ".": "./dist/index.js"
   },
-  "types": "./dist/index.d.ts",
+  "author": "info@wonderwall.kr",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/knowmerce/delivery-tracker"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "scripts": {
     "build": "tsc -p .",
     "build-with-deps": "pnpm build",
