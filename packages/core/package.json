@@ -1,6 +1,6 @@
 {
   "name": "@knowmerce/delivery-tracker-core",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "commonjs",
   "exports": {
     ".": "./dist/index.js"
@@ -15,7 +15,7 @@
     "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
-    "build": "tsc -p .",
+    "build": "nest build",
     "build-with-deps": "pnpm build",
     "test": "jest"
   },
