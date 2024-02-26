@@ -7,3 +7,5 @@ export {
   CarrierUpstreamFetcher,
   type CarrierUpstreamFetcherInitInput,
 } from "./carrier-upstream-fetcher/CarrierUpstreamFetcher";
+export { CarrierService } from "./carriers/carrier";
+export { UPS } from "./carriers/us.ups";
