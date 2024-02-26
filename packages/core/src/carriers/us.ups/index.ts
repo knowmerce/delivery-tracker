@@ -9,7 +9,7 @@ import {
 import { rootLogger } from "../../logger";
 import { BadRequestError, NotFoundError } from "../../core/errors";
 import { DateTime } from "luxon";
-import { CarrierUpstreamFetcher } from "../../carrier-upstream-fetcher/CarrierUpstreamFetcher";
+import { type CarrierUpstreamFetcher } from "../../carrier-upstream-fetcher/CarrierUpstreamFetcher";
 import { Cookie } from "tough-cookie";
 
 const carrierLogger = rootLogger.child({
@@ -18,23 +18,22 @@ const carrierLogger = rootLogger.child({
 
 class UPS extends Carrier {
   readonly carrierId = "us.ups";
-  // static carrierId1 = "us.ups";
-  // public async track(input: CarrierTrackInput): Promise<TrackInfo> {
-  //   return await new UPSTrackScraper(
-  //     this.upstreamFetcher,
-  //     input.trackingNumber
-  //   ).track();
-  // }
 
   public async track(input: CarrierTrackInput): Promise<TrackInfo> {
-    // 생성자에서 upstreamFetcher를 초기화하지 않아서 에러가 발생했었음
-    // upstreamFetcher을 전달해준다.
-    const upstreamFetcher = new CarrierUpstreamFetcher({ carrier: this });
     return await new UPSTrackScraper(
-      upstreamFetcher,
+      this.upstreamFetcher,
       input.trackingNumber
     ).track();
   }
+
+  // UPSTrackScraper의 생성자를 이곳에서 초기화하는 방법 (기록용)
+  // public async track(input: CarrierTrackInput): Promise<TrackInfo> {
+  //   const upstreamFetcher = new CarrierUpstreamFetcher({ carrier: this });
+  //   return await new UPSTrackScraper(
+  //     upstreamFetcher,
+  //     input.trackingNumber
+  //   ).track();
+  // }
 }
 
 class UPSTrackScraper {
