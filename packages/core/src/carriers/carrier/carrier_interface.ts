@@ -23,6 +23,6 @@ export class CarrierFactory implements CarrierFactoryInterface {
 }
 
 export enum Carriers {
-  UPS = "us.ups",
-  HANJIN = "kr.hanjin",
+  UPS = "ups",
+  HANJIN = "hanjin",
 }
