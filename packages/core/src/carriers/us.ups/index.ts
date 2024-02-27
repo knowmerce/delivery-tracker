@@ -11,7 +11,7 @@ import { BadRequestError, NotFoundError } from "../../core/errors";
 import { DateTime } from "luxon";
 import { type CarrierUpstreamFetcher } from "../../carrier-upstream-fetcher/CarrierUpstreamFetcher";
 import { Cookie } from "tough-cookie";
-import { Carriers } from "../carrier";
+import { Carriers } from "../common";
 
 const carrierLogger = rootLogger.child({
   carrierId: "us.ups",

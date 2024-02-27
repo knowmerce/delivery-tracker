@@ -16,7 +16,7 @@ import {
 import { DateTime } from "luxon";
 import { JSDOM } from "jsdom";
 import { type CarrierUpstreamFetcher } from "../../carrier-upstream-fetcher/CarrierUpstreamFetcher";
-import { Carriers } from "../carrier";
+import { Carriers } from "../common";
 
 const carrierLogger = rootLogger.child({
   carrierId: "kr.hanjin",
