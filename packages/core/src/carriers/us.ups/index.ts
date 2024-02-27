@@ -11,13 +11,14 @@ import { BadRequestError, NotFoundError } from "../../core/errors";
 import { DateTime } from "luxon";
 import { type CarrierUpstreamFetcher } from "../../carrier-upstream-fetcher/CarrierUpstreamFetcher";
 import { Cookie } from "tough-cookie";
+import { Carriers } from "../carrier";
 
 const carrierLogger = rootLogger.child({
   carrierId: "us.ups",
 });
 
 class UPS extends Carrier {
-  readonly carrierId = "us.ups";
+  readonly carrierId = Carriers.UPS;
 
   public async track(input: CarrierTrackInput): Promise<TrackInfo> {
     return await new UPSTrackScraper(

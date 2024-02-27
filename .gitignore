@@ -3,3 +3,7 @@ dist
 generated
 .idea
 .npmrc
+.DS_Store
+.vscode
+.env*
+.env.*

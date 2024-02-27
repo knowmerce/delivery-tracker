@@ -1,6 +1,6 @@
 {
   "name": "@knowmerce/delivery-tracker-core",
-  "version": "1.0.0-beta99",
+  "version": "1.0.0",
   "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,7 +19,9 @@
   "scripts": {
     "build": "tsc -p .",
     "build-with-deps": "pnpm build",
-    "test": "jest"
+    "test": "jest",
+    "publish:beta": "pnpm build && pnpm publish --tag beta --no-git-checks --ignore-scripts",
+    "publish": "pnpm build && pnpm publish --no-git-check --ignore-scripts"
   },
   "dependencies": {
     "cheerio": "1.0.0-rc.12",

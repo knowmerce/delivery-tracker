@@ -9,7 +9,7 @@ interface CarrierFactoryInterface {
 
 // CarrierFactory의 createInstance를 구현한다.
 // 서브클래스에서 인스턴스의 타입이 결정된다.
-class CarrierFactory implements CarrierFactoryInterface {
+export class CarrierFactory implements CarrierFactoryInterface {
   createInstance(carrierId: string): Carrier {
     switch (carrierId) {
       case "us.ups":
@@ -22,4 +22,7 @@ class CarrierFactory implements CarrierFactoryInterface {
   }
 }
 
-export { CarrierFactory };
+export enum Carriers {
+  UPS = "us.ups",
+  HANJIN = "kr.hanjin",
+}
