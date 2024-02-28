@@ -12,9 +12,9 @@ interface CarrierFactoryInterface {
 export class CarrierFactory implements CarrierFactoryInterface {
   createInstance(carrierId: string): Carrier {
     switch (carrierId) {
-      case "us.ups":
+      case Carriers.UPS:
         return new UPS();
-      case "kr.hanjin":
+      case Carriers.HANJIN:
         return new Hanjin();
       default:
         throw new Error(`Unsupported carrier: ${carrierId}`);

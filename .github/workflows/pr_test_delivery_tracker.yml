@@ -28,6 +28,7 @@ jobs:
       matrix:
         node-version: [20]
     steps:
+      - name: Checkout Branch
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v3

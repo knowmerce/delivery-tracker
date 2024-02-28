@@ -7,4 +7,4 @@ export {
   CarrierUpstreamFetcher,
   type CarrierUpstreamFetcherInitInput,
 } from "./carrier-upstream-fetcher/CarrierUpstreamFetcher";
-export * from "./carriers/carrier";
+export * from "./carriers/common";
