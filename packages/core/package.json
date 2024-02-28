@@ -1,6 +1,6 @@
 {
   "name": "@knowmerce/delivery-tracker-core",
-  "version": "1.0.0",
+  "version": "1.0.0-beta1",
   "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
