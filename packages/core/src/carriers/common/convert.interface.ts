@@ -1,22 +1,21 @@
 import { TrackEventStatusCode, type TrackInfo } from "../../core";
 
-// progresses.status
-export interface ConvertTrackInfoResponseStatus {
-  id: TrackEventStatusCode;
+interface ConvertTrackInfoResponseStatus {
+  id: TrackEventStatusCode; // 이 프로젝트에 정의된 상태값 사용
   text: string | null;
 }
 
-export interface ConvertTrackInfoResponseFrom {
+interface ConvertTrackInfoResponseFrom {
   name?: string | null;
   time?: string | null;
 }
 
-export interface ConvertTrackInfoResponseTo {
+interface ConvertTrackInfoResponseTo {
   name?: string | null;
   time?: string | null;
 }
 
-export interface ConvertTrackInfoResponseProgress {
+interface ConvertTrackInfoResponseProgress {
   time: string | null;
   location?: string | null;
   status: ConvertTrackInfoResponseStatus;

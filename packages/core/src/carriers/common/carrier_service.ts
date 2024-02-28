@@ -1,4 +1,5 @@
 import { CarrierUpstreamFetcher } from "../../carrier-upstream-fetcher";
+import { type TrackInfo } from "../../core";
 import { CarrierFactory } from "./carrier_interface";
 import {
   convertTrackInfo,
@@ -13,7 +14,7 @@ export class CarrierService {
   }: {
     carrierId: string;
     trackingNumber: string;
-  }): Promise<any> {
+  }): Promise<ConvertTrackInfoResponse> {
     // carrierId에 따라 instance를 동적으로 가져온다.
     const instance = new CarrierFactory().createInstance(carrierId);
 
@@ -25,7 +26,7 @@ export class CarrierService {
 
     const trackInfo: ConvertTrackInfoResponse = await instance
       .track({ trackingNumber })
-      .then((res) => convertTrackInfo(res));
+      .then((res: TrackInfo) => convertTrackInfo(res));
 
     return trackInfo;
   }
