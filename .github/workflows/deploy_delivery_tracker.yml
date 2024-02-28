@@ -27,6 +27,8 @@ jobs:
           version: 8
 
       - name: Use Node.js ${{ matrix.node-version }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
