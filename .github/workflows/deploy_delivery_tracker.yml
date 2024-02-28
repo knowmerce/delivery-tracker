@@ -43,7 +43,7 @@ jobs:
           pnpm run build
 
       - name: Publish Packages DEV
-        if: github.ref != 'refs/heads/dev'
+        if: github.ref == 'refs/heads/dev'
         env:
           CI: false
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -52,7 +52,7 @@ jobs:
           pnpm run build:beta
 
       - name: Publish Packages MAIN
-        if: github.ref != 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         env:
           CI: false
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
