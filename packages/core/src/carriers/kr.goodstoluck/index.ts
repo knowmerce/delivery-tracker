@@ -1,5 +1,5 @@
 import { type Logger } from "winston";
-import { parsePhoneNumber } from "libphonenumber-js";
+import { PhoneNumber, parsePhoneNumber } from "libphonenumber-js";
 import {
   Carrier,
   type CarrierTrackInput,
@@ -134,7 +134,7 @@ class GoodsToLuckTrackScraper {
     locationName: string | null,
     phoneNumber: string | null
   ): ContactInfo | null {
-    let phoneNumberObj = null;
+    let phoneNumberObj: PhoneNumber | null = null;
     if (phoneNumber != null) {
       try {
         phoneNumberObj = parsePhoneNumber(phoneNumber, "KR");

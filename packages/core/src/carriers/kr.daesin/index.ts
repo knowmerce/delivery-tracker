@@ -160,7 +160,7 @@ class DaesinTrackScraper {
     const currentLocation =
       tds[5].textContent?.replace(/\s+/g, " ")?.trim() ?? null;
 
-    const events = [];
+    const events: any[] = [];
     for (const eventType of [EventType.Enter, EventType.Leave]) {
       if (
         eventType === EventType.Leave &&

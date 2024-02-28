@@ -12,5 +12,7 @@ module.exports = {
     project: ["tsconfig.json"],
     sourceType: "module",
   },
-  rules: {},
+  rules: {
+    "@typescript-eslint/strict-boolean-expressions": 0,
+  },
 };

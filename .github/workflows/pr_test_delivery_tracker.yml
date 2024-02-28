@@ -1,0 +1,62 @@
+name: DeliveryTracker Test on PR
+
+on:
+  pull_request:
+    types: [synchronize, ready_for_review, opened, reopened]
+    branches: [master, feature/*, work/*]
+    paths:
+      - "packages/core/**"
+
+jobs:
+  StartNotification:
+    uses: ./.github/workflows/slack_start_notification.yml
+    with:
+      action: "pr_test"
+    secrets: inherit
+
+  CheckVersion:
+    uses: ./.github/workflows/check_version.yml
+    with:
+      path: "packages/core"
+
+  Test:
+    runs-on: ubuntu-22.04
+    outputs:
+      status: ${{ job.status }}
+    continue-on-error: true
+    strategy:
+      matrix:
+        node-version: [20]
+    steps:
+      - name: Checkout Branch
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+
+      - name: Install Packages
+        run: |
+          cd packages/core
+          pnpm i --frozen-lockfile
+
+      - name: Build Packages
+        run: |
+          cd packages/core
+          pnpm run build
+
+  EndNotification:
+    needs: [StartNotification, Test]
+    uses: ./.github/workflows/slack_end_notification.yml
+    with:
+      action: "pr_test"
+      status: ${{ needs.Test.outputs.status }}
+      message-ts: ${{ needs.StartNotification.outputs.message-ts }}
+      start-ts: ${{ needs.StartNotification.outputs.start-ts }}
+    secrets: inherit

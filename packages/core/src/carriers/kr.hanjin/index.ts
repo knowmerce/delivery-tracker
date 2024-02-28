@@ -16,13 +16,14 @@ import {
 import { DateTime } from "luxon";
 import { JSDOM } from "jsdom";
 import { type CarrierUpstreamFetcher } from "../../carrier-upstream-fetcher/CarrierUpstreamFetcher";
+import { Carriers } from "../common";
 
 const carrierLogger = rootLogger.child({
   carrierId: "kr.hanjin",
 });
 
 class Hanjin extends Carrier {
-  readonly carrierId = "kr.hanjin";
+  readonly carrierId = Carriers.HANJIN;
 
   public async track(input: CarrierTrackInput): Promise<TrackInfo> {
     return await new HanjinTrackScraper(
