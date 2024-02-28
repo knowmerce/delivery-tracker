@@ -49,7 +49,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd packages/core
-          pnpm run build:beta
+          pnpm run publish:beta
 
       - name: Publish Packages MAIN
         if: github.ref == 'refs/heads/main'
@@ -58,7 +58,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd packages/core
-          pnpm run build
+          pnpm run publish
 
   EndNotification:
     needs: [StartNotification, Deploy]
