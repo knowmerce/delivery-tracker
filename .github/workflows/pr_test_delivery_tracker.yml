@@ -3,7 +3,7 @@ name: DeliveryTracker Test on PR
 on:
   pull_request:
     types: [synchronize, ready_for_review, opened, reopened]
-    branches: [master, feature/*, work/*]
+    branches: [main, feature/*, work/*]
     paths:
       - "packages/core/**"
 
