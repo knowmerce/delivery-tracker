@@ -2,85 +2,85 @@
 name: Notify start to slack
 
 on:
-    workflow_call:
-        inputs:
-            action:
-                description: 'The action name - pr_test, deploy'
-                required: true
-                type: string
-        outputs:
-            message-ts:
-                description: 'outputs.message-ts of StartNotification'
-                value: ${{ jobs.StartNotification.outputs.message-ts }}
-            start-ts:
-                description: 'outputs.start-ts of StartNotification'
-                value: ${{ jobs.StartNotification.outputs.start-ts }}
+  workflow_call:
+    inputs:
+      action:
+        description: "The action name - pr_test, deploy"
+        required: true
+        type: string
+    outputs:
+      message-ts:
+        description: "outputs.message-ts of StartNotification"
+        value: ${{ jobs.StartNotification.outputs.message-ts }}
+      start-ts:
+        description: "outputs.start-ts of StartNotification"
+        value: ${{ jobs.StartNotification.outputs.start-ts }}
 
 jobs:
-    StartNotification:
-        runs-on: ubuntu-22.04
-        outputs:
-            message-ts: ${{ steps.slack.outputs.response && fromJSON(steps.slack.outputs.response).ts }}
-            start-ts: ${{ steps.prepare.outputs.now }}
-        continue-on-error: true
-        steps:
-            - name: Create SLACK_CHANNEL variables
-              run: |
-                  if [ ${{ github.ref }} == 'refs/heads/master' ]; then
-                      echo SLACK_CHANNEL='C06F3PRM6GY' >> $GITHUB_ENV
-                  else
-                      echo SLACK_CHANNEL='C06EESU9667' >> $GITHUB_ENV
-                  fi
+  StartNotification:
+    runs-on: ubuntu-22.04
+    outputs:
+      message-ts: ${{ steps.slack.outputs.response && fromJSON(steps.slack.outputs.response).ts }}
+      start-ts: ${{ steps.prepare.outputs.now }}
+    continue-on-error: true
+    steps:
+      - name: Create SLACK_CHANNEL variables
+        run: |
+          if [ ${{ github.ref }} == 'refs/heads/main' ]; then
+              echo SLACK_CHANNEL='C06F3PRM6GY' >> $GITHUB_ENV
+          else
+              echo SLACK_CHANNEL='C06EESU9667' >> $GITHUB_ENV
+          fi
 
-            # commit_message : split('\n')[0]
-            # now : now()
-            - name: Prepare Variables
-              id: prepare
-              run: |
-                  COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
-                  COMMIT_MESSAGE="${COMMIT_MESSAGE//'%'/'%25'}"
-                  COMMIT_MESSAGE="${COMMIT_MESSAGE//$'\n'/'%0A'}"
-                  COMMIT_MESSAGE="${COMMIT_MESSAGE//$'\r'/'%0D'}"
-                  echo "commit_message=${COMMIT_MESSAGE}" >> $GITHUB_OUTPUT
-                  echo "now=$(date +'%s')" >> $GITHUB_OUTPUT
+      # commit_message : split('\n')[0]
+      # now : now()
+      - name: Prepare Variables
+        id: prepare
+        run: |
+          COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+          COMMIT_MESSAGE="${COMMIT_MESSAGE//'%'/'%25'}"
+          COMMIT_MESSAGE="${COMMIT_MESSAGE//$'\n'/'%0A'}"
+          COMMIT_MESSAGE="${COMMIT_MESSAGE//$'\r'/'%0D'}"
+          echo "commit_message=${COMMIT_MESSAGE}" >> $GITHUB_OUTPUT
+          echo "now=$(date +'%s')" >> $GITHUB_OUTPUT
 
-            - name: Create slack data
-              run: |
-                  if [ ${{ inputs.action }} == 'deploy' ]; then
-                      echo TEXT="Commit \`pushed\` by <${{ github.event.sender.html_url}}|${{ github.actor }}> to \`${{ github.ref_name }}\`" >> $GITHUB_ENV
-                      echo ATTACHMENTS_TEXT="<${{ github.event.head_commit.url }}|${{ steps.prepare.outputs.commit_message }}>" >> $GITHUB_ENV
-                      echo COLOR="#663399" >> $GITHUB_ENV
-                  else
-                      echo TEXT="Pull request \`${{ github.event.action}}\` by <${{ github.event.sender.html_url}}|${{ github.actor }}> to \`${{ github.base_ref }}\`" >> $GITHUB_ENV
-                      echo ATTACHMENTS_TEXT="<${{ github.event.pull_request.html_url }}|#${{ github.event.number }} ${{ github.event.pull_request.title }}>" >> $GITHUB_ENV
-                      echo COLOR="#439FE0" >> $GITHUB_ENV
-                  fi
+      - name: Create slack data
+        run: |
+          if [ ${{ inputs.action }} == 'deploy' ]; then
+              echo TEXT="Commit \`pushed\` by <${{ github.event.sender.html_url}}|${{ github.actor }}> to \`${{ github.ref_name }}\`" >> $GITHUB_ENV
+              echo ATTACHMENTS_TEXT="<${{ github.event.head_commit.url }}|${{ steps.prepare.outputs.commit_message }}>" >> $GITHUB_ENV
+              echo COLOR="#663399" >> $GITHUB_ENV
+          else
+              echo TEXT="Pull request \`${{ github.event.action}}\` by <${{ github.event.sender.html_url}}|${{ github.actor }}> to \`${{ github.base_ref }}\`" >> $GITHUB_ENV
+              echo ATTACHMENTS_TEXT="<${{ github.event.pull_request.html_url }}|#${{ github.event.number }} ${{ github.event.pull_request.title }}>" >> $GITHUB_ENV
+              echo COLOR="#439FE0" >> $GITHUB_ENV
+          fi
 
-            - name: Slack Notification on Start
-              id: slack
-              uses: fjogeleit/http-request-action@v1.15.2
-              with:
-                  url: https://slack.com/api/chat.postMessage
-                  method: POST
-                  bearerToken: ${{ secrets.SLACK_BOT_TOKEN }}
-                  data: |
-                      {
-                        "channel": "${{ env.SLACK_CHANNEL }}",
-                        "unfurl_links": "false",
-                        "unfurl_media": "false",
-                        "text": "${{ env.TEXT }}",
-                        "attachments": [
-                          {
-                            "text": "${{ env.ATTACHMENTS_TEXT }}",
-                            "footer": "${{ github.repository }}",
-                            "footer_icon": "https://slack-imgs.com/?c=1&o1=wi32.he32.si&url=https%3A%2F%2Fslack.github.com%2Fstatic%2Fimg%2Ffavicon-neutral.png",
-                            "ts": "${{ steps.prepare.outputs.now }}",
-                            "color": "${{ env.COLOR }}"
-                          },
-                          {
-                            "text": ":rocket: <${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}|${{ github.workflow }} #${{ github.run_number }}> is running",
-                            "footer": "Github Actions is running . .",
-                            "color": "warning"
-                          }
-                        ]
-                      }
+      - name: Slack Notification on Start
+        id: slack
+        uses: fjogeleit/http-request-action@v1.15.2
+        with:
+          url: https://slack.com/api/chat.postMessage
+          method: POST
+          bearerToken: ${{ secrets.SLACK_BOT_TOKEN }}
+          data: |
+            {
+              "channel": "${{ env.SLACK_CHANNEL }}",
+              "unfurl_links": "false",
+              "unfurl_media": "false",
+              "text": "${{ env.TEXT }}",
+              "attachments": [
+                {
+                  "text": "${{ env.ATTACHMENTS_TEXT }}",
+                  "footer": "${{ github.repository }}",
+                  "footer_icon": "https://slack-imgs.com/?c=1&o1=wi32.he32.si&url=https%3A%2F%2Fslack.github.com%2Fstatic%2Fimg%2Ffavicon-neutral.png",
+                  "ts": "${{ steps.prepare.outputs.now }}",
+                  "color": "${{ env.COLOR }}"
+                },
+                {
+                  "text": ":rocket: <${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}|${{ github.workflow }} #${{ github.run_number }}> is running",
+                  "footer": "Github Actions is running . .",
+                  "color": "warning"
+                }
+              ]
+            }
