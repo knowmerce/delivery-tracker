@@ -1,5 +1,9 @@
 import { TrackEventStatusCode, type TrackInfo } from "../../core";
 
+interface ConvertTrackInfoResponseProgressLocation {
+  name?: string | null;
+}
+
 interface ConvertTrackInfoResponseStatus {
   id: TrackEventStatusCode; // 이 프로젝트에 정의된 상태값 사용
   text: string | null;
@@ -17,7 +21,7 @@ interface ConvertTrackInfoResponseTo {
 
 interface ConvertTrackInfoResponseProgress {
   time: string | null;
-  location?: string | null;
+  location?: ConvertTrackInfoResponseProgressLocation;
   status: ConvertTrackInfoResponseStatus;
   description: string | null;
 }
@@ -42,7 +46,7 @@ export const convertTrackInfo = (
         each.time !== null
           ? `${each.time.toFormat("yyyy-MM-dd HH:mm:ss")}+09:00`
           : null,
-      location: each.location?.name,
+      location: { name: each.location?.name },
       status: { id: each.status.code, text: each.status.name },
       description: each.description,
     })),
