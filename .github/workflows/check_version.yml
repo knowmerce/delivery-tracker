@@ -10,7 +10,7 @@ on:
 
 jobs:
   CheckVersion:
-    if: ${{ github.base_ref == 'master' }}
+    if: ${{ github.base_ref == 'main' }}
     runs-on: ubuntu-22.04
     outputs:
       status: ${{ job.status }}

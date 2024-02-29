@@ -2,129 +2,129 @@
 name: Notify end to slack
 
 on:
-    workflow_call:
-        inputs:
-            action:
-                description: 'The action name - pr_test, deploy'
-                required: true
-                type: string
-            status:
-                description: 'outputs.status of Test or Deploy'
-                required: true
-                type: string
-            message-ts:
-                description: 'outputs.message-ts of StartNotification'
-                required: true
-                type: string
-            start-ts:
-                description: 'outputs.start-ts of StartNotification'
-                required: true
-                type: string
+  workflow_call:
+    inputs:
+      action:
+        description: "The action name - pr_test, deploy"
+        required: true
+        type: string
+      status:
+        description: "outputs.status of Test or Deploy"
+        required: true
+        type: string
+      message-ts:
+        description: "outputs.message-ts of StartNotification"
+        required: true
+        type: string
+      start-ts:
+        description: "outputs.start-ts of StartNotification"
+        required: true
+        type: string
 
 jobs:
-    EndNotification:
-        runs-on: ubuntu-22.04
-        steps:
-            - name: Create SLACK_CHANNEL variables
-              run: |
-                  if [ ${{ github.ref }} == 'refs/heads/master' ]; then
-                      echo SLACK_CHANNEL='C06F3PRM6GY' >> $GITHUB_ENV
-                  else
-                      echo SLACK_CHANNEL='C06EESU9667' >> $GITHUB_ENV
-                  fi
+  EndNotification:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Create SLACK_CHANNEL variables
+        run: |
+          if [ ${{ github.ref }} == 'refs/heads/main' ]; then
+              echo SLACK_CHANNEL='C06F3PRM6GY' >> $GITHUB_ENV
+          else
+              echo SLACK_CHANNEL='C06EESU9667' >> $GITHUB_ENV
+          fi
 
-            - name: Prepare Variables
-              id: prepare
-              run: |
-                  COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
-                  COMMIT_MESSAGE="${COMMIT_MESSAGE//'%'/'%25'}"
-                  COMMIT_MESSAGE="${COMMIT_MESSAGE//$'\n'/'%0A'}"
-                  COMMIT_MESSAGE="${COMMIT_MESSAGE//$'\r'/'%0D'}"
-                  echo "commit_message=${COMMIT_MESSAGE}" >> $GITHUB_OUTPUT
-                  echo "now=$(date +'%s')" >> $GITHUB_OUTPUT
+      - name: Prepare Variables
+        id: prepare
+        run: |
+          COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+          COMMIT_MESSAGE="${COMMIT_MESSAGE//'%'/'%25'}"
+          COMMIT_MESSAGE="${COMMIT_MESSAGE//$'\n'/'%0A'}"
+          COMMIT_MESSAGE="${COMMIT_MESSAGE//$'\r'/'%0D'}"
+          echo "commit_message=${COMMIT_MESSAGE}" >> $GITHUB_OUTPUT
+          echo "now=$(date +'%s')" >> $GITHUB_OUTPUT
 
-            - name: Create slack data
-              run: |
-                  if [ ${{ inputs.action }} == 'deploy' ]; then
-                      echo TEXT="Commit \`pushed\` by <${{ github.event.sender.html_url}}|${{ github.actor }}> to \`${{ github.ref_name }}\`" >> $GITHUB_ENV
-                      echo ATTACHMENTS_TEXT="<${{ github.event.head_commit.url }}|${{ steps.prepare.outputs.commit_message }}>" >> $GITHUB_ENV
-                      echo COLOR="#663399" >> $GITHUB_ENV
-                  else
-                      echo TEXT="Pull request \`${{ github.event.action}}\` by <${{ github.event.sender.html_url}}|${{ github.actor }}> to \`${{ github.base_ref }}\`" >> $GITHUB_ENV
-                      echo ATTACHMENTS_TEXT="<${{ github.event.pull_request.html_url }}|#${{ github.event.number }} ${{ github.event.pull_request.title }}>" >> $GITHUB_ENV
-                      echo COLOR="#439FE0" >> $GITHUB_ENV
-                  fi
+      - name: Create slack data
+        run: |
+          if [ ${{ inputs.action }} == 'deploy' ]; then
+              echo TEXT="Commit \`pushed\` by <${{ github.event.sender.html_url}}|${{ github.actor }}> to \`${{ github.ref_name }}\`" >> $GITHUB_ENV
+              echo ATTACHMENTS_TEXT="<${{ github.event.head_commit.url }}|${{ steps.prepare.outputs.commit_message }}>" >> $GITHUB_ENV
+              echo COLOR="#663399" >> $GITHUB_ENV
+          else
+              echo TEXT="Pull request \`${{ github.event.action}}\` by <${{ github.event.sender.html_url}}|${{ github.actor }}> to \`${{ github.base_ref }}\`" >> $GITHUB_ENV
+              echo ATTACHMENTS_TEXT="<${{ github.event.pull_request.html_url }}|#${{ github.event.number }} ${{ github.event.pull_request.title }}>" >> $GITHUB_ENV
+              echo COLOR="#439FE0" >> $GITHUB_ENV
+          fi
 
-            - name: Slack Notification on Success
-              if: ${{ inputs.status == 'success' }}
-              uses: fjogeleit/http-request-action@v1.15.2
-              with:
-                  url: https://slack.com/api/chat.update
-                  method: POST
-                  bearerToken: ${{ secrets.SLACK_BOT_TOKEN }}
-                  data: |
-                      {
-                        "channel": "${{ env.SLACK_CHANNEL }}",
-                        "unfurl_links": "false",
-                        "unfurl_media": "false",
-                        "ts": "${{ inputs.message-ts }}",
-                        "text": "${{ env.TEXT }}",
-                        "attachments": [
-                          {
-                            "text": "${{ env.ATTACHMENTS_TEXT }}",
-                            "footer": "${{ github.repository }}",
-                            "footer_icon": "https://slack-imgs.com/?c=1&o1=wi32.he32.si&url=https%3A%2F%2Fslack.github.com%2Fstatic%2Fimg%2Ffavicon-neutral.png",
-                            "ts": "${{ inputs.start-ts }}",
-                            "color": "${{ env.COLOR }}"
-                          },
-                          {
-                            "text": ":white_check_mark: <${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}|${{ github.workflow }} #${{ github.run_number }}> is successful",
-                            "footer": "Github Actions is successful !",
-                            "ts": ${{ steps.prepare.outputs.now }},
-                            "color": "good"
-                          }
-                        ]
-                      }
+      - name: Slack Notification on Success
+        if: ${{ inputs.status == 'success' }}
+        uses: fjogeleit/http-request-action@v1.15.2
+        with:
+          url: https://slack.com/api/chat.update
+          method: POST
+          bearerToken: ${{ secrets.SLACK_BOT_TOKEN }}
+          data: |
+            {
+              "channel": "${{ env.SLACK_CHANNEL }}",
+              "unfurl_links": "false",
+              "unfurl_media": "false",
+              "ts": "${{ inputs.message-ts }}",
+              "text": "${{ env.TEXT }}",
+              "attachments": [
+                {
+                  "text": "${{ env.ATTACHMENTS_TEXT }}",
+                  "footer": "${{ github.repository }}",
+                  "footer_icon": "https://slack-imgs.com/?c=1&o1=wi32.he32.si&url=https%3A%2F%2Fslack.github.com%2Fstatic%2Fimg%2Ffavicon-neutral.png",
+                  "ts": "${{ inputs.start-ts }}",
+                  "color": "${{ env.COLOR }}"
+                },
+                {
+                  "text": ":white_check_mark: <${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}|${{ github.workflow }} #${{ github.run_number }}> is successful",
+                  "footer": "Github Actions is successful !",
+                  "ts": ${{ steps.prepare.outputs.now }},
+                  "color": "good"
+                }
+              ]
+            }
 
-            - name: Slack Notification on Failure
-              if: ${{ inputs.status == 'failure' }}
-              uses: fjogeleit/http-request-action@v1.15.2
-              with:
-                  url: https://slack.com/api/chat.update
-                  method: POST
-                  bearerToken: ${{ secrets.SLACK_BOT_TOKEN }}
-                  data: |
-                      {
-                        "channel": "${{ env.SLACK_CHANNEL }}",
-                        "unfurl_links": "false",
-                        "unfurl_media": "false",
-                        "ts": "${{ inputs.message-ts }}",
-                        "text": "${{ env.TEXT }}",
-                        "attachments": [
-                          {
-                            "text": "${{ env.ATTACHMENTS_TEXT }}",
-                            "footer": "${{ github.repository }}",
-                            "footer_icon": "https://slack-imgs.com/?c=1&o1=wi32.he32.si&url=https%3A%2F%2Fslack.github.com%2Fstatic%2Fimg%2Ffavicon-neutral.png",
-                            "ts": "${{ inputs.start-ts }}",
-                            "color": "${{ env.COLOR }}"
-                          },
-                          {
-                            "text": ":x: <${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}|${{ github.workflow }} #${{ github.run_number }}> is failed",
-                            "footer": "Github Actions is failed !",
-                            "ts": "${{ steps.prepare.outputs.now }}",
-                            "color": "danger"
-                          }
-                        ]
-                      }
-
-    ViewFailedIfDeployFailed:
-        runs-on: ubuntu-22.04
-        needs: [EndNotification]
+      - name: Slack Notification on Failure
         if: ${{ inputs.status == 'failure' }}
-        steps:
-            - name: Mark action failed if deploy failed
-              uses: actions/github-script@v7
-              with:
-                  script: |
-                      console.log('Deploy failed. Please check the logs.');
-                      process.exit(1);
+        uses: fjogeleit/http-request-action@v1.15.2
+        with:
+          url: https://slack.com/api/chat.update
+          method: POST
+          bearerToken: ${{ secrets.SLACK_BOT_TOKEN }}
+          data: |
+            {
+              "channel": "${{ env.SLACK_CHANNEL }}",
+              "unfurl_links": "false",
+              "unfurl_media": "false",
+              "ts": "${{ inputs.message-ts }}",
+              "text": "${{ env.TEXT }}",
+              "attachments": [
+                {
+                  "text": "${{ env.ATTACHMENTS_TEXT }}",
+                  "footer": "${{ github.repository }}",
+                  "footer_icon": "https://slack-imgs.com/?c=1&o1=wi32.he32.si&url=https%3A%2F%2Fslack.github.com%2Fstatic%2Fimg%2Ffavicon-neutral.png",
+                  "ts": "${{ inputs.start-ts }}",
+                  "color": "${{ env.COLOR }}"
+                },
+                {
+                  "text": ":x: <${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}|${{ github.workflow }} #${{ github.run_number }}> is failed",
+                  "footer": "Github Actions is failed !",
+                  "ts": "${{ steps.prepare.outputs.now }}",
+                  "color": "danger"
+                }
+              ]
+            }
+
+  ViewFailedIfDeployFailed:
+    runs-on: ubuntu-22.04
+    needs: [EndNotification]
+    if: ${{ inputs.status == 'failure' }}
+    steps:
+      - name: Mark action failed if deploy failed
+        uses: actions/github-script@v7
+        with:
+          script: |
+            console.log('Deploy failed. Please check the logs.');
+            process.exit(1);
