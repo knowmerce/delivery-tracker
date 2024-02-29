@@ -203,7 +203,7 @@ class ChunilpsTrackScraper {
     name: string | null,
     phoneNumber: string | null
   ): ContactInfo | null {
-    let phoneNumberObj = null;
+    let phoneNumberObj: PhoneNumber | null = null;
     if (phoneNumber != null) {
       try {
         phoneNumberObj = parsePhoneNumber(phoneNumber, "KR");
@@ -267,7 +267,7 @@ class ChunilpsTrackScraper {
       };
     }
 
-    let phoneNumber = null;
+    let phoneNumber: PhoneNumber | null = null;
 
     if (match[2] !== undefined) {
       try {

@@ -1,15 +1,27 @@
 {
-  "name": "@delivery-tracker/core",
-  "private": true,
+  "name": "@knowmerce/delivery-tracker-core",
+  "version": "1.0.0",
   "type": "commonjs",
-  "exports": {
-    ".": "./dist/index.js"
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "author": "info@wonderwall.kr",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/knowmerce/delivery-tracker"
   },
-  "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "scripts": {
     "build": "tsc -p .",
     "build-with-deps": "pnpm build",
-    "test": "jest"
+    "test": "jest",
+    "publish:beta": "pnpm build && pnpm publish --tag beta --no-git-checks --ignore-scripts",
+    "publish": "pnpm build && pnpm publish --no-git-check --ignore-scripts"
   },
   "dependencies": {
     "cheerio": "1.0.0-rc.12",

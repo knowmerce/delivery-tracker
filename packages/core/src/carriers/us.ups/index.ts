@@ -11,13 +11,14 @@ import { BadRequestError, NotFoundError } from "../../core/errors";
 import { DateTime } from "luxon";
 import { type CarrierUpstreamFetcher } from "../../carrier-upstream-fetcher/CarrierUpstreamFetcher";
 import { Cookie } from "tough-cookie";
+import { Carriers } from "../common";
 
 const carrierLogger = rootLogger.child({
   carrierId: "us.ups",
 });
 
 class UPS extends Carrier {
-  readonly carrierId = "us.ups";
+  readonly carrierId = Carriers.UPS;
 
   public async track(input: CarrierTrackInput): Promise<TrackInfo> {
     return await new UPSTrackScraper(
@@ -25,6 +26,15 @@ class UPS extends Carrier {
       input.trackingNumber
     ).track();
   }
+
+  // UPSTrackScraper의 생성자를 이곳에서 초기화하는 방법 (기록용)
+  // public async track(input: CarrierTrackInput): Promise<TrackInfo> {
+  //   const upstreamFetcher = new CarrierUpstreamFetcher({ carrier: this });
+  //   return await new UPSTrackScraper(
+  //     upstreamFetcher,
+  //     input.trackingNumber
+  //   ).track();
+  // }
 }
 
 class UPSTrackScraper {
@@ -44,7 +54,7 @@ class UPSTrackScraper {
       )}&loc=en_US`
     );
 
-    const cookies = [];
+    const cookies: Cookie[] = [];
     for (const [name, value] of trackPageResponse.headers.entries()) {
       if (name !== "set-cookie") continue;
       const cookie = Cookie.parse(value);

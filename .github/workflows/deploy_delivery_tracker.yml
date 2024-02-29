@@ -1,0 +1,75 @@
+name: DeliveryTracker Deploy
+
+on:
+  push:
+    branches: [dev, main]
+    paths:
+      - "packages/core/**"
+
+jobs:
+  StartNotification:
+    uses: ./.github/workflows/slack_start_notification.yml
+    with:
+      action: "deploy"
+    secrets: inherit
+
+  Deploy:
+    runs-on: ubuntu-22.04
+    outputs:
+      status: ${{ job.status }}
+    continue-on-error: true
+    steps:
+      - name: Checkout Branch
+        uses: actions/checkout@v4
+
+      - name: SetUp pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: "https://npm.pkg.github.com"
+          cache: "pnpm"
+
+      - name: Install Packages
+        run: |
+          cd packages/core
+          pnpm i --frozen-lockfile
+
+      - name: Build Packages
+        run: |
+          cd packages/core
+          pnpm run build
+
+      - name: Publish Packages DEV
+        if: github.ref == 'refs/heads/dev'
+        env:
+          CI: false
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd packages/core
+          pnpm run publish:beta
+
+      - name: Publish Packages MAIN
+        if: github.ref == 'refs/heads/main'
+        env:
+          CI: false
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd packages/core
+          pnpm run publish
+
+  EndNotification:
+    needs: [StartNotification, Deploy]
+    uses: ./.github/workflows/slack_end_notification.yml
+    with:
+      action: "deploy"
+      status: ${{ needs.Deploy.outputs.status }}
+      message-ts: ${{ needs.StartNotification.outputs.message-ts }}
+      start-ts: ${{ needs.StartNotification.outputs.start-ts }}
+    secrets: inherit
