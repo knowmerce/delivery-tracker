@@ -1,4 +1,4 @@
-name: DeliveryTracker Test on PR
+name: DeliveryTracker PR
 
 on:
   pull_request:
@@ -29,9 +29,10 @@ jobs:
         node-version: [20]
     steps:
       - name: Checkout Branch
-      - uses: actions/checkout@v4
+        uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v3
+      - name: SetUp pnpm
+        uses: pnpm/action-setup@v3
         with:
           version: 8
 
