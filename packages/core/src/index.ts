@@ -8,3 +8,4 @@ export {
   type CarrierUpstreamFetcherInitInput,
 } from "./carrier-upstream-fetcher/CarrierUpstreamFetcher";
 export * from "./carriers/common";
+export * from "./core/interfaces";
