@@ -16,6 +16,7 @@ import { schemas as DHLAPISchemas } from "./DHLAPISchemas";
 import { type z } from "zod";
 import { DateTime } from "luxon";
 import { type CarrierUpstreamFetcher } from "../../carrier-upstream-fetcher/CarrierUpstreamFetcher";
+import { Carriers } from "../common";
 
 const carrierLogger = rootLogger.child({
   carrierId: "de.dhl",
@@ -37,23 +38,14 @@ interface TransformTimestampInput {
 }
 
 class DHL extends Carrier {
-  readonly carrierId = "de.dhl";
-  private config: DHLConfig | null = null;
+  readonly carrierId = Carriers.DHL;
 
-  public async init(
-    input: CarrierInitInput & { config: DHLConfig }
-  ): Promise<void> {
+  public async init(input: CarrierInitInput): Promise<void> {
     await super.init(input);
-    this.config = input.config;
   }
 
   public async track(input: CarrierTrackInput): Promise<TrackInfo> {
-    if (this.config == null) {
-      throw new Error("DHL is not initialized");
-    }
-
     return await new DHLTrackScraper(
-      this.config,
       this.upstreamFetcher,
       input.trackingNumber
     ).track();
@@ -64,19 +56,13 @@ class DHLTrackScraper {
   private readonly logger: Logger;
 
   constructor(
-    readonly config: DHLConfig,
     readonly upstreamFetcher: CarrierUpstreamFetcher,
     readonly trackingNumber: string
   ) {
     this.logger = carrierLogger.child({ trackingNumber });
   }
 
-  private get endpoint(): string {
-    if (this.config.endpoint == null) {
-      return "https://api-eu.dhl.com";
-    }
-    return this.config.endpoint;
-  }
+  private readonly endpoint = "https://api-eu.dhl.com";
 
   public async track(): Promise<TrackInfo> {
     const queryString = new URLSearchParams({
@@ -92,7 +78,7 @@ class DHLTrackScraper {
       {
         headers: [
           ["accept", "application/json"],
-          ["DHL-API-Key", this.config.apiKey],
+          ["DHL-API-Key", "JKxVN4HO36O8fY8OyLLz3QbqjNRpRaaF"],
         ],
       }
     );
@@ -151,8 +137,7 @@ class DHLTrackScraper {
       typeof DHLAPISchemas.supermodelIoLogisticsTrackingShipmentEvent
     >
   ): Promise<TrackEvent> {
-    const transformTimestamp =
-      this.config.transformTimestamp ?? this.defaultTransformTimestamp();
+    const transformTimestamp = this.defaultTransformTimestamp();
 
     let status: TrackEventStatus;
     if (event.status === undefined) {

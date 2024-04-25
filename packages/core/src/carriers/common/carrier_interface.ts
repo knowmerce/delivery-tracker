@@ -1,4 +1,5 @@
 import { type Carrier } from "../../core/interfaces";
+import { DHL } from "../de.dhl";
 import { Hanjin } from "../kr.hanjin";
 import { UPS } from "../us.ups";
 
@@ -16,6 +17,8 @@ export class CarrierFactory implements CarrierFactoryInterface {
         return new UPS();
       case Carriers.HANJIN:
         return new Hanjin();
+      case Carriers.DHL:
+        return new DHL();
       default:
         throw new Error(`Unsupported carrier: ${carrierId}`);
     }
@@ -25,4 +28,5 @@ export class CarrierFactory implements CarrierFactoryInterface {
 export enum Carriers {
   UPS = "ups",
   HANJIN = "hanjin",
+  DHL = "dhl",
 }
